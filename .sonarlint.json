@@ -1,0 +1,6 @@
+{
+  "sonarlint.ls.javaHome": "",
+  "sonarlint.connectedMode.project": {
+    "projectKey": "trackme"
+  }
+}
