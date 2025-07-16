@@ -1,0 +1,17 @@
+.layout {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+}
+
+.right-panel {
+  background-color: white;
+  position: fixed;
+  top: 3rem;
+  right: 0;
+  height: 100%;
+  width: 250px;
+  padding: 1rem;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
