@@ -12,14 +12,16 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@carbon/react": "^1.87.0-rc.0",
+    "@carbon/icons-react": "^11.63.0",
+    "@carbon/react": "^1.87.0",
     "@tanstack/react-query": "^5.82.0",
     "axios": "^1.10.0",
     "geojson": "^0.5.0",
     "leaflet": "^1.9.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-leaflet": "^5.0.0"
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.6.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
