@@ -12,6 +12,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@carbon/react": "^1.87.0-rc.0",
     "@tanstack/react-query": "^5.82.0",
     "axios": "^1.10.0",
     "geojson": "^0.5.0",
@@ -19,12 +20,6 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-leaflet": "^5.0.0"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,css,md,json}": [
-      "prettier --write",
-      "eslint --fix"
-    ]
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
@@ -49,10 +44,17 @@
     "husky": "^8.0.3",
     "lint-staged": "^16.1.2",
     "prettier": "^3.6.2",
+    "sass": "^1.89.2",
     "sonarlint": "^1.1.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
     "vite": "^7.0.4",
     "vite-tsconfig-paths": "^5.1.4"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css,md,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }
