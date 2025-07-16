@@ -17,7 +17,7 @@ const Layout: FC<{ children: ReactNode }> = ({ children }) => {
         <LayoutHeader />
         <LayoutSideNav />
         <LayoutHeaderPanel />
-        <Content>{children}</Content>
+        <Content className="content-body">{children}</Content>
       </div>
     </LayoutProvider>
   );

@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 
 import './index.scss';
 import { useLayout } from '@/context/layout';
+import { ROUTE_PATHS } from '@/routes/routePaths';
 
 export const LayoutHeader: FC = () => {
   const { isSideNavExpanded, toggleSideNav, toggleHeaderPanel } = useLayout();
@@ -25,13 +26,13 @@ export const LayoutHeader: FC = () => {
         onClick={toggleSideNav}
       />
 
-      <HeaderName as={Link} to={'/'} prefix="Track.me">
-        Cruz
+      <HeaderName as={Link} to={ROUTE_PATHS.home.path} prefix="Track.me">
+        {ROUTE_PATHS.home.name}
       </HeaderName>
 
       <HeaderNavigation aria-label="Track.me">
-        <HeaderMenuItem as={Link} to={'/menu'} isActive={false}>
-          Menu
+        <HeaderMenuItem as={Link} to={ROUTE_PATHS.dashboard.path} isActive={false}>
+          {ROUTE_PATHS.dashboard.name}
         </HeaderMenuItem>
       </HeaderNavigation>
 

@@ -1,27 +1,31 @@
 import { lazy } from 'react';
 
-import { ROUTE_PATHS } from './routePaths';
+import { ROUTE_PATHS, type RouteDescription } from './routePaths';
 
 const Home = lazy(() => import('@/pages/Home'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
-export const routeConfig = [
+type RouteConfigDescription = RouteDescription & {
+  element: React.ReactNode;
+};
+
+export const routeConfig: RouteConfigDescription[] = [
   {
-    path: ROUTE_PATHS.home,
+    ...ROUTE_PATHS.home,
     element: <Home />,
   },
   {
-    path: ROUTE_PATHS.dashboard,
+    ...ROUTE_PATHS.dashboard,
     element: <Dashboard />,
   },
   {
-    path: ROUTE_PATHS.settings,
+    ...ROUTE_PATHS.settings,
     element: <Settings />,
   },
   {
-    path: ROUTE_PATHS.notFound,
+    ...ROUTE_PATHS.notFound,
     element: <NotFound />,
   },
 ];
