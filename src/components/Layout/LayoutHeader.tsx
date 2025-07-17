@@ -7,16 +7,35 @@ import {
   HeaderMenuButton,
   HeaderNavigation,
   HeaderMenuItem,
+  HeaderMenu,
 } from '@carbon/react';
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 
 import './index.scss';
 import { useLayout } from '@/context/layout';
-import { ROUTE_PATHS } from '@/routes/routePaths';
+import { ROUTE_PATHS, type RouteDescription } from '@/routes/routePaths';
 
 export const LayoutHeader: FC = () => {
   const { isSideNavExpanded, toggleSideNav, toggleHeaderPanel } = useLayout();
+
+  const renderMenuLink = (route: RouteDescription) => (
+    <HeaderMenuItem key={route.name} as={Link} to={route.path} isActive={false}>
+      {route.name}
+    </HeaderMenuItem>
+  );
+
+  const renderMenuItem = (route: RouteDescription) => (
+    <HeaderMenu menuLinkName={route.name} isActive={false}>
+      {route.children
+        ?.filter((childRoute) => childRoute.isMenuItem)
+        .map((childRoute) => (
+          <HeaderMenuItem key={childRoute.name} as={Link} to={childRoute.path} isActive={false}>
+            {childRoute.name}
+          </HeaderMenuItem>
+        ))}
+    </HeaderMenu>
+  );
 
   return (
     <Header aria-label="Track.me">
@@ -31,9 +50,9 @@ export const LayoutHeader: FC = () => {
       </HeaderName>
 
       <HeaderNavigation aria-label="Track.me">
-        <HeaderMenuItem as={Link} to={ROUTE_PATHS.dashboard.path} isActive={false}>
-          {ROUTE_PATHS.dashboard.name}
-        </HeaderMenuItem>
+        {Object.values(ROUTE_PATHS)
+          .filter((route) => route.isTopLevel && route.isMenuItem)
+          .map((route) => (route.children ? renderMenuItem(route) : renderMenuLink(route)))}
       </HeaderNavigation>
 
       <HeaderGlobalBar>
