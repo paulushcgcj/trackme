@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => ({
     globals: true,
     exclude: [...configDefaults.exclude, 'dist/**', 'build/**'],
     coverage: {
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'html', 'junit'],
     },
     projects: [
       {
