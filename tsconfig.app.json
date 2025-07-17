@@ -24,12 +24,18 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "types": ["leaflet", "react-leaflet", "@tanstack/react-query", "axios"],
+    "types": [
+      "leaflet",
+      "react-leaflet",
+      "@tanstack/react-query",
+      "axios",
+      "@vitest/browser/providers/playwright"
+    ],
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     }
   },
   "include": ["src"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules", "**/tests/*.ts", "**/__tests__/**"]
 }
