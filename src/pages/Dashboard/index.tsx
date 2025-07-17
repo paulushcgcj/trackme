@@ -9,7 +9,7 @@ import {
 } from '@carbon/react';
 import { type FC } from 'react';
 
-import MapLayout from '@/components/Map';
+import Map from '@/components/Map';
 
 import './index.scss';
 
@@ -28,7 +28,7 @@ const rows = [
 const Dashboard: FC = () => {
   return (
     <div className="dashboard-body">
-      <MapLayout />
+      <Map position={[48.43737, -123.35883]} zoomLevel={13} />
       <TableContainer title="Sensors">
         <Table>
           <TableHead>

@@ -1,8 +1,4 @@
 import { Grid, Column } from '@carbon/react';
-
-import Map from '@/components/Map';
-import './index.scss';
-
 import {
   Table,
   TableBody,
@@ -12,6 +8,9 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
+
+import Map from '@/components/Map';
+import './index.scss';
 
 const headers = [
   { key: 'id', header: 'ID' },
@@ -36,7 +35,7 @@ const Home = () => {
       {/* Map Row */}
       <Column sm={4} md={8} lg={16}>
         <div className="map-holder">
-          <Map />
+          <Map position={[48.43737, -123.35883]} zoomLevel={13} />
         </div>
       </Column>
 

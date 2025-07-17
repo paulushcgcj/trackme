@@ -5,14 +5,15 @@ import MapFitBound from '@/components/Map/MapFitBound';
 
 import 'leaflet/dist/leaflet.css';
 import './index.scss';
+import type { LatLngExpression } from 'leaflet';
 
 interface MapLayoutProps {
-  position?: [number, number];
-  zoomLevel?: number;
+  position: LatLngExpression;
+  zoomLevel: number;
 }
 
-const MapLayout: FC<MapLayoutProps> = ({ position = [48.43737, -123.35883], zoomLevel = 13 }) => {
-  const [mapCenter, setMapCenter] = useState<[number, number]>(position);
+const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
+  const [mapCenter, setMapCenter] = useState<LatLngExpression>(position);
   const [mapZoom, setMapZoom] = useState<number>(zoomLevel);
 
   useEffect(() => {
