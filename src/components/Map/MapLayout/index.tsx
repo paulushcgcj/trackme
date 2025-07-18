@@ -1,10 +1,15 @@
+import { useQuery } from '@tanstack/react-query';
 import { type FC, useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, LayersControl } from 'react-leaflet';
+import { MapContainer, TileLayer, LayersControl } from 'react-leaflet';
 
+import MapEntry from '@/components/Map/MapEntry';
 import MapFitBound from '@/components/Map/MapFitBound';
-
+import MapInfoControl from '@/components/Map/MapInfoControl';
 import 'leaflet/dist/leaflet.css';
 import './index.scss';
+import { OPEN_MAPS_URL } from '@/constants/openMaps';
+
+import type { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import type { LatLngExpression } from 'leaflet';
 
 interface MapLayoutProps {
@@ -15,6 +20,8 @@ interface MapLayoutProps {
 const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
   const [mapCenter, setMapCenter] = useState<LatLngExpression>(position);
   const [mapZoom, setMapZoom] = useState<number>(zoomLevel);
+  const [hoveredFeature, setHoveredFeature] = useState<GeoJSON.Feature | undefined>(undefined);
+  const [infoPannelTitle] = useState<string>('Opening Info');
 
   useEffect(() => {
     setMapCenter(position);
@@ -24,6 +31,28 @@ const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
     setMapZoom(zoomLevel);
   }, [zoomLevel]);
 
+  /* Start of temporary/demo block */
+  const searchKey = 'OPENING_ID=60000';
+  const typeNames = [
+    'WHSE_FOREST_VEGETATION.RSLT_FOREST_COVER_INV_SVW',
+    'WHSE_FOREST_VEGETATION.RSLT_FOREST_COVER_RESERVE_SVW',
+    'WHSE_FOREST_VEGETATION.RSLT_FOREST_COVER_SILV_SVW',
+  ];
+
+  const fetchMapData = async (): Promise<FeatureCollection<Geometry, GeoJsonProperties>> => {
+    const response = await fetch(OPEN_MAPS_URL);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  };
+
+  const { data } = useQuery({
+    queryKey: ['map', 'entry', 'get', searchKey, typeNames],
+    queryFn: async () => fetchMapData(),
+  });
+  /* End of temporary/demo block */
+
   return (
     <div className="map-layout">
       <MapContainer
@@ -32,8 +61,19 @@ const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
         scrollWheelZoom={false}
         className="leaflet-container"
       >
-        <MapFitBound polygons={[]} defaultLocation={mapCenter} defaultZoom={mapZoom} />
+        <MapFitBound
+          polygons={data ? [data] : []}
+          defaultLocation={mapCenter}
+          defaultZoom={mapZoom}
+        />
 
+        <MapEntry
+          entry={data ?? ({} as FeatureCollection<Geometry, GeoJsonProperties>)}
+          onHover={setHoveredFeature}
+          onBlur={() => setHoveredFeature(undefined)}
+        />
+
+        <MapInfoControl title={infoPannelTitle} hoveredFeature={hoveredFeature} />
         <LayersControl position="topright">
           <LayersControl.BaseLayer name="ESRI Topography">
             <TileLayer
@@ -64,11 +104,6 @@ const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
             />
           </LayersControl.BaseLayer>
         </LayersControl>
-        <Marker position={mapCenter}>
-          <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
-        </Marker>
       </MapContainer>
     </div>
   );
