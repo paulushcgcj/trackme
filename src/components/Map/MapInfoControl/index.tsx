@@ -1,23 +1,16 @@
 import L from 'leaflet';
-import { type FC, useEffect, useRef } from 'react';
+import { type FC, type ReactNode, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 import { useMap } from 'react-leaflet';
-
-import MapInfoPanel from '@/components/Map/MapInfoPanel';
 
 import './index.scss';
 
 interface MapInfoControlProps {
-  hoveredFeature?: GeoJSON.Feature;
-  title: string;
+  content?: ReactNode;
   position?: 'topright' | 'topleft' | 'bottomright' | 'bottomleft';
 }
 
-const MapInfoControl: FC<MapInfoControlProps> = ({
-  hoveredFeature,
-  title,
-  position = 'topright',
-}) => {
+const MapInfoControl: FC<MapInfoControlProps> = ({ content, position = 'topright' }) => {
   const map = useMap();
   const controlRef = useRef<L.Control | null>(null);
   const rootRef = useRef<ReturnType<typeof ReactDOM.createRoot>>(null);
@@ -31,7 +24,7 @@ const MapInfoControl: FC<MapInfoControlProps> = ({
         this._container = container;
         if (!rootRef.current) {
           rootRef.current = ReactDOM.createRoot(container);
-          rootRef.current.render(<MapInfoPanel title={title} feature={undefined} />);
+          rootRef.current.render(content ?? <></>);
         }
         return container;
       },
@@ -40,13 +33,13 @@ const MapInfoControl: FC<MapInfoControlProps> = ({
     const instance = new InfoControl({ position });
     controlRef.current = instance;
     map.addControl(instance);
-  }, [map, position, title]);
+  }, [content, map, position]);
 
   useEffect(() => {
     if (rootRef.current) {
-      rootRef.current.render(<MapInfoPanel title={title} feature={hoveredFeature} />);
+      rootRef.current.render(content ?? <></>);
     }
-  }, [hoveredFeature, title]);
+  }, [content]);
 
   return null;
 };
