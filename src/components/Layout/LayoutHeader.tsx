@@ -26,7 +26,7 @@ export const LayoutHeader: FC = () => {
   );
 
   const renderMenuItem = (route: RouteDescription) => (
-    <HeaderMenu menuLinkName={route.name} isActive={false}>
+    <HeaderMenu key={route.name} menuLinkName={route.name} isActive={false}>
       {route.children
         ?.filter((childRoute) => childRoute.isMenuItem)
         .map((childRoute) => (

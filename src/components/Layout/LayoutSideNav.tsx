@@ -16,7 +16,7 @@ export const LayoutSideNav: FC = () => {
   );
 
   const renderMenuItem = (route: RouteDescription) => (
-    <SideNavMenu title={route.name} isActive={false}>
+    <SideNavMenu key={route.name} title={route.name} isActive={false}>
       {route.children
         ?.filter((childRoute) => childRoute.isMenuItem)
         .map((childRoute) => (
