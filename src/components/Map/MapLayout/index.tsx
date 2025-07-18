@@ -1,16 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
+import { type LatLngExpression } from 'leaflet';
 import { type FC, useState, useEffect } from 'react';
 import { MapContainer, TileLayer, LayersControl } from 'react-leaflet';
 
 import MapEntry from '@/components/Map/MapEntry';
+import MapEntryFilter from '@/components/Map/MapEntryFilter';
 import MapFitBound from '@/components/Map/MapFitBound';
 import MapInfoControl from '@/components/Map/MapInfoControl';
+import MapInfoPanel from '@/components/Map/MapInfoPanel';
 import 'leaflet/dist/leaflet.css';
 import './index.scss';
-import { OPEN_MAPS_URL } from '@/constants/openMaps';
+import { OPEN_MAPS_URL, FETCH_PARAMS } from '@/constants/openMaps';
 
 import type { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import type { LatLngExpression } from 'leaflet';
 
 interface MapLayoutProps {
   position: LatLngExpression;
@@ -18,10 +20,18 @@ interface MapLayoutProps {
 }
 
 const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
+  // global map state
   const [mapCenter, setMapCenter] = useState<LatLngExpression>(position);
   const [mapZoom, setMapZoom] = useState<number>(zoomLevel);
+  // information panel state
   const [hoveredFeature, setHoveredFeature] = useState<GeoJSON.Feature | undefined>(undefined);
   const [infoPannelTitle] = useState<string>('Opening Info');
+  // data and filtered data state
+  const [keyHash, setKeyHash] = useState<string>('no-key');
+  const [yearFilter, setYearFilter] = useState<number | null>(null);
+  const [currentFeatures, setCurrentFeatures] = useState<
+    FeatureCollection<Geometry, GeoJsonProperties>[]
+  >([]);
 
   useEffect(() => {
     setMapCenter(position);
@@ -32,13 +42,7 @@ const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
   }, [zoomLevel]);
 
   /* Start of temporary/demo block */
-  const searchKey = 'OPENING_ID=60000';
-  const typeNames = [
-    'WHSE_FOREST_VEGETATION.RSLT_FOREST_COVER_INV_SVW',
-    'WHSE_FOREST_VEGETATION.RSLT_FOREST_COVER_RESERVE_SVW',
-    'WHSE_FOREST_VEGETATION.RSLT_FOREST_COVER_SILV_SVW',
-  ];
-
+  // Everything inside this block is a temporary solution for fetching map data.
   const fetchMapData = async (): Promise<FeatureCollection<Geometry, GeoJsonProperties>> => {
     const response = await fetch(OPEN_MAPS_URL);
     if (!response.ok) {
@@ -48,9 +52,42 @@ const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
   };
 
   const { data } = useQuery({
-    queryKey: ['map', 'entry', 'get', searchKey, typeNames],
+    queryKey: ['map', 'entry', 'get'],
     queryFn: async () => fetchMapData(),
   });
+
+  useEffect(() => {
+    if (data) {
+      setCurrentFeatures([data]);
+      setKeyHash(data.features.length > 0 ? (data.features[0].id as string) : 'no-key');
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (data) {
+      if (yearFilter) {
+        const filteredData: FeatureCollection<Geometry, GeoJsonProperties> =
+          data && yearFilter
+            ? {
+                ...data,
+                features: data.features.filter(
+                  (feature) => feature.properties?.REFERENCE_YEAR === yearFilter,
+                ),
+              }
+            : data;
+        setCurrentFeatures([filteredData]);
+        setKeyHash(
+          filteredData.features.length > 0
+            ? `${filteredData.features[0].id as string}-${yearFilter}`
+            : 'no-key',
+        );
+      } else {
+        setCurrentFeatures([data]);
+        setKeyHash(data.features.length > 0 ? (data.features[0].id as string) : 'no-key');
+      }
+    }
+  }, [yearFilter, data]);
+
   /* End of temporary/demo block */
 
   return (
@@ -61,19 +98,20 @@ const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
         scrollWheelZoom={false}
         className="leaflet-container"
       >
-        <MapFitBound
-          polygons={data ? [data] : []}
-          defaultLocation={mapCenter}
-          defaultZoom={mapZoom}
-        />
+        <MapFitBound polygons={currentFeatures} defaultLocation={mapCenter} defaultZoom={mapZoom} />
 
-        <MapEntry
-          entry={data ?? ({} as FeatureCollection<Geometry, GeoJsonProperties>)}
-          onHover={setHoveredFeature}
-          onBlur={() => setHoveredFeature(undefined)}
-        />
+        {currentFeatures.map((feature, index) => (
+          <MapEntry
+            key={`map-entry-${index}-${keyHash}`}
+            entry={feature}
+            onHover={setHoveredFeature}
+            onBlur={() => setHoveredFeature(undefined)}
+          />
+        ))}
 
-        <MapInfoControl title={infoPannelTitle} hoveredFeature={hoveredFeature} />
+        <MapInfoControl
+          content={<MapInfoPanel title={infoPannelTitle} feature={hoveredFeature} />}
+        />
         <LayersControl position="topright">
           <LayersControl.BaseLayer name="ESRI Topography">
             <TileLayer
@@ -104,6 +142,24 @@ const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
             />
           </LayersControl.BaseLayer>
         </LayersControl>
+
+        {/* Control the below map info to only be added when we are using the correct type for the request */}
+        {FETCH_PARAMS.typeName === 'WHSE_FOREST_VEGETATION.RSLT_FOREST_COVER_INV_SVW' && (
+          <MapInfoControl
+            content={
+              <MapEntryFilter
+                title="Forest cover by year"
+                feature={data}
+                selector={(f) => f.properties?.REFERENCE_YEAR}
+                formatter={(value) => `Year ${value}`}
+                onSelectionChange={(selectedYear) => {
+                  setYearFilter(selectedYear as number);
+                }}
+              />
+            }
+            position="bottomright"
+          />
+        )}
       </MapContainer>
     </div>
   );
