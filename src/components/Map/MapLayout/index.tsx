@@ -23,6 +23,7 @@ const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
   // global map state
   const [mapCenter, setMapCenter] = useState<LatLngExpression>(position);
   const [mapZoom, setMapZoom] = useState<number>(zoomLevel);
+  const [map, setMap] = useState<L.Map | null>(null);
   // information panel state
   const [hoveredFeature, setHoveredFeature] = useState<GeoJSON.Feature | undefined>(undefined);
   const [infoPannelTitle] = useState<string>('Opening Info');
@@ -91,12 +92,29 @@ const MapLayout: FC<MapLayoutProps> = ({ position, zoomLevel }) => {
   /* End of temporary/demo block */
 
   return (
-    <div className="map-layout">
+    <div
+      className="map-layout"
+      onKeyDown={(e) => {
+        if (e.key === 'Control') {
+          if (map) {
+            map.scrollWheelZoom.enable();
+          }
+        }
+      }}
+      onKeyUp={(e) => {
+        if (e.key === 'Control') {
+          if (map) {
+            map.scrollWheelZoom.disable();
+          }
+        }
+      }}
+    >
       <MapContainer
         center={mapCenter}
         zoom={mapZoom}
         scrollWheelZoom={false}
         className="leaflet-container"
+        ref={setMap}
       >
         <MapFitBound polygons={currentFeatures} defaultLocation={mapCenter} defaultZoom={mapZoom} />
 
